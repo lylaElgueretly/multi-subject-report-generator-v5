@@ -70,6 +70,147 @@ if 'app_initialized' not in st.session_state:
     # Store form data separately
     if 'form_data' not in st.session_state:
         st.session_state.form_data = {}
+    if 'all_comments' not in st.session_state:
+        st.session_state.all_comments = []
+    if 'variant_history' not in st.session_state:
+        st.session_state.variant_history = {}  # Track variant usage per student
+
+# ========== HELPER FUNCTIONS ==========
+def apply_british_spelling(text):
+    """Convert American spelling to British spelling"""
+    if not text:
+        return text
+    
+    # Common American to British spelling conversions
+    replacements = {
+        r'\borganized\b': 'organised',
+        r'\brealized\b': 'realised',
+        r'\brecognized\b': 'recognised',
+        r'\banalyzed\b': 'analysed',
+        r'\bcategorized\b': 'categorised',
+        r'\bcharacterized\b': 'characterised',
+        r'\bemphasized\b': 'emphasised',
+        r'\bfavor\b': 'favour',
+        r'\bcolor\b': 'colour',
+        r'\blabor\b': 'labour',
+        r'\bhonor\b': 'honour',
+        r'\bbehavior\b': 'behaviour',
+        r'\bfavorite\b': 'favourite',
+        r'\bcenter\b': 'centre',
+        r'\bmeter\b': 'metre',
+        r'\bliter\b': 'litre',
+        r'\btheater\b': 'theatre',
+        r'\banalyze\b': 'analyse',
+        r'\bcivilize\b': 'civilise',
+        r'\borganize\b': 'organise',
+        r'\brealize\b': 'realise',
+        r'\brecognize\b': 'recognise',
+        r'\bcharacterize\b': 'characterise',
+        r'\bemphasize\b': 'emphasise',
+        r'\bdefense\b': 'defence',
+        r'\boffense\b': 'offence',
+        r'\blicense\b': 'licence',
+        r'\bpractice\b': 'practise',  # verb
+        r'\bpracticed\b': 'practised',
+        r'\bpracticing\b': 'practising',
+        r'\btraveled\b': 'travelled',
+        r'\btraveling\b': 'travelling',
+        r'\bcanceled\b': 'cancelled',
+        r'\bcanceling\b': 'cancelling',
+        r'\bmodeled\b': 'modelled',
+        r'\bmodeling\b': 'modelling',
+        r'\blabeled\b': 'labelled',
+        r'\blabeling\b': 'labelling',
+        r'\bsignaled\b': 'signalled',
+        r'\bsignaling\b': 'signalling',
+    }
+    
+    for american, british in replacements.items():
+        text = re.sub(american, british, text, flags=re.IGNORECASE)
+    
+    return text
+
+def validate_upload_rate():
+    """Prevent rapid-fire uploads/abuse"""
+    time_since_last = datetime.now() - st.session_state.last_upload_time
+    if time_since_last < timedelta(seconds=RATE_LIMIT_SECONDS):
+        wait_time = RATE_LIMIT_SECONDS - time_since_last.seconds
+        st.error(f"Please wait {wait_time} seconds before uploading again")
+        return False
+    return True
+
+def sanitize_input(text, max_length=100):
+    """Sanitize user input to prevent injection attacks"""
+    if not text:
+        return ""
+    sanitized = ''.join(c for c in text if c.isalnum() or c in " .'-")
+    return sanitized[:max_length].strip().title()
+
+def validate_file(file):
+    """Validate uploaded file size and type"""
+    if file.size > MAX_FILE_SIZE_MB * 1024 * 1024:
+        return False, f"File too large (max {MAX_FILE_SIZE_MB}MB)"
+    if not file.name.lower().endswith('.csv'):
+        return False, "Only CSV files allowed"
+    return True, ""
+
+def process_csv_securely(uploaded_file):
+    """Process CSV with auto-cleanup of temp files"""
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='wb') as tmp:
+        tmp.write(uploaded_file.getvalue())
+        temp_path = tmp.name
+    
+    try:
+        df = pd.read_csv(temp_path, nrows=MAX_ROWS_PER_UPLOAD + 1)
+        if len(df) > MAX_ROWS_PER_UPLOAD:
+            st.warning(f"Only processing first {MAX_ROWS_PER_UPLOAD} rows")
+            df = df.head(MAX_ROWS_PER_UPLOAD)
+        if 'Student Name' in df.columns:
+            df['Student Name'] = df['Student Name'].apply(lambda x: sanitize_input(str(x)))
+        return df
+    except Exception as e:
+        st.error(f"Error reading CSV: {e}")
+        return None
+    finally:
+        try:
+            os.unlink(temp_path)
+        except:
+            pass
+
+def get_pronouns(gender):
+    gender = gender.lower()
+    if gender == "male":
+        return "he", "his"
+    elif gender == "female":
+        return "she", "her"
+    return "they", "their"
+
+def lowercase_first(text):
+    return text[0].lower() + text[1:] if text else ""
+
+def truncate_comment(comment, target=TARGET_CHARS):
+    if len(comment) <= target:
+        return comment
+    truncated = comment[:target].rstrip(" ,;.")
+    if "." in truncated:
+        truncated = truncated[:truncated.rfind(".")+1]
+    return truncated
+
+def fix_pronouns_in_text(text, pronoun, possessive):
+    """Fix gender pronouns in statement text using word boundaries"""
+    if not text:
+        return text
+    
+    text = re.sub(r'\bhe\b', pronoun, text, flags=re.IGNORECASE)
+    text = re.sub(r'\bHe\b', pronoun.capitalize(), text)
+    text = re.sub(r'\bhis\b', possessive, text, flags=re.IGNORECASE)
+    text = re.sub(r'\bHis\b', possessive.capitalize(), text)
+    text = re.sub(r'\bhim\b', pronoun, text, flags=re.IGNORECASE)
+    text = re.sub(r'\bHim\b', pronoun.capitalize(), text)
+    text = re.sub(r'\bhimself\b', f"{pronoun}self", text, flags=re.IGNORECASE)
+    text = re.sub(r'\bherself\b', f"{pronoun}self", text, flags=re.IGNORECASE)
+    
+    return text
 
 # ========== IMPORT STATEMENTS ==========
 try:
@@ -258,90 +399,7 @@ except ImportError as e:
     st.info("Make sure all statement files are in the same directory")
     st.stop()
 
-# ========== SECURITY FUNCTIONS ==========
-def validate_upload_rate():
-    """Prevent rapid-fire uploads/abuse"""
-    time_since_last = datetime.now() - st.session_state.last_upload_time
-    if time_since_last < timedelta(seconds=RATE_LIMIT_SECONDS):
-        wait_time = RATE_LIMIT_SECONDS - time_since_last.seconds
-        st.error(f"Please wait {wait_time} seconds before uploading again")
-        return False
-    return True
-
-def sanitize_input(text, max_length=100):
-    """Sanitize user input to prevent injection attacks"""
-    if not text:
-        return ""
-    sanitized = ''.join(c for c in text if c.isalnum() or c in " .'-")
-    return sanitized[:max_length].strip().title()
-
-def validate_file(file):
-    """Validate uploaded file size and type"""
-    if file.size > MAX_FILE_SIZE_MB * 1024 * 1024:
-        return False, f"File too large (max {MAX_FILE_SIZE_MB}MB)"
-    if not file.name.lower().endswith('.csv'):
-        return False, "Only CSV files allowed"
-    return True, ""
-
-def process_csv_securely(uploaded_file):
-    """Process CSV with auto-cleanup of temp files"""
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='wb') as tmp:
-        tmp.write(uploaded_file.getvalue())
-        temp_path = tmp.name
-    
-    try:
-        df = pd.read_csv(temp_path, nrows=MAX_ROWS_PER_UPLOAD + 1)
-        if len(df) > MAX_ROWS_PER_UPLOAD:
-            st.warning(f"Only processing first {MAX_ROWS_PER_UPLOAD} rows")
-            df = df.head(MAX_ROWS_PER_UPLOAD)
-        if 'Student Name' in df.columns:
-            df['Student Name'] = df['Student Name'].apply(lambda x: sanitize_input(str(x)))
-        return df
-    except Exception as e:
-        st.error(f"Error reading CSV: {e}")
-        return None
-    finally:
-        try:
-            os.unlink(temp_path)
-        except:
-            pass
-
-# ========== HELPER FUNCTIONS ==========
-def get_pronouns(gender):
-    gender = gender.lower()
-    if gender == "male":
-        return "he", "his"
-    elif gender == "female":
-        return "she", "her"
-    return "they", "their"
-
-def lowercase_first(text):
-    return text[0].lower() + text[1:] if text else ""
-
-def truncate_comment(comment, target=TARGET_CHARS):
-    if len(comment) <= target:
-        return comment
-    truncated = comment[:target].rstrip(" ,;.")
-    if "." in truncated:
-        truncated = truncated[:truncated.rfind(".")+1]
-    return truncated
-
-def fix_pronouns_in_text(text, pronoun, possessive):
-    """Fix gender pronouns in statement text using word boundaries"""
-    if not text:
-        return text
-    
-    text = re.sub(r'\bhe\b', pronoun, text, flags=re.IGNORECASE)
-    text = re.sub(r'\bHe\b', pronoun.capitalize(), text)
-    text = re.sub(r'\bhis\b', possessive, text, flags=re.IGNORECASE)
-    text = re.sub(r'\bHis\b', possessive.capitalize(), text)
-    text = re.sub(r'\bhim\b', pronoun, text, flags=re.IGNORECASE)
-    text = re.sub(r'\bHim\b', pronoun.capitalize(), text)
-    text = re.sub(r'\bhimself\b', f"{pronoun}self", text, flags=re.IGNORECASE)
-    text = re.sub(r'\bherself\b', f"{pronoun}self", text, flags=re.IGNORECASE)
-    
-    return text
-
+# ========== COMMENT GENERATOR FUNCTIONS ==========
 def get_statement_banks(subject, year, variant=0):
     """
     Get statement banks based on subject, year, and variant.
@@ -432,7 +490,6 @@ def get_statement_banks(subject, year, variant=0):
     # Default fallback
     return None
 
-# ========== COMMENT GENERATOR ==========
 def generate_comment(subject, year, name, gender, att, achieve, target, attitude_target="", variant=0):
     """
     Generate report comment with optional variant support.
@@ -531,7 +588,7 @@ def generate_comment(subject, year, name, gender, att, achieve, target, attitude
         writing_target_sentence = ""
         closer_sentence = random.choice(closer_bank)
     
-    # Optional attitude target - FIXED: Now properly included
+    # Optional attitude target
     if attitude_target and attitude_target.strip():
         attitude_target = sanitize_input(attitude_target)
         attitude_target_sentence = f"{lowercase_first(attitude_target)}"
@@ -541,7 +598,7 @@ def generate_comment(subject, year, name, gender, att, achieve, target, attitude
     else:
         attitude_target_sentence = ""
     
-    # Assemble comment - FIXED: Include attitude_target_sentence properly
+    # Assemble comment
     comment_parts = [
         attitude_sentence,
         reading_sentence,
@@ -549,7 +606,7 @@ def generate_comment(subject, year, name, gender, att, achieve, target, attitude
         reading_target_sentence,
         writing_target_sentence,
         closer_sentence,
-        attitude_target_sentence  # This was missing!
+        attitude_target_sentence
     ]
     
     comment = " ".join([c for c in comment_parts if c])
@@ -565,6 +622,9 @@ def generate_comment(subject, year, name, gender, att, achieve, target, attitude
         comment = comment.rstrip(' ,;') + '.'
     
     comment = comment.replace('..', '.')
+    
+    # Apply British spelling
+    comment = apply_british_spelling(comment)
     
     return comment
 
@@ -620,6 +680,8 @@ with st.sidebar:
         st.session_state.upload_count = 0
         st.session_state.last_upload_time = datetime.now()
         st.session_state.form_data = {}
+        st.session_state.all_comments = []
+        st.session_state.variant_history = {}
         st.success("All data cleared!")
         st.rerun()
     
@@ -694,9 +756,18 @@ if app_mode == "Single Student":
     
     # Initialize form data in session state
     if 'form_data' not in st.session_state:
-        st.session_state.form_data = {}
+        st.session_state.form_data = {
+            'subject': 'English',
+            'year': 7,
+            'name': '',
+            'gender': 'Male',
+            'att': 75,
+            'achieve': 75,
+            'target': 75,
+            'attitude_target': ''
+        }
     
-    # Create form with unique key
+    # Create form
     with st.form(key="student_form"):
         col1, col2 = st.columns(2)
         
@@ -730,24 +801,20 @@ if app_mode == "Single Student":
             att = st.selectbox(
                 "Attitude Band", 
                 options=[90,85,80,75,70,65,60,55,40],
-                index=3  # Default to 75
+                index=[90,85,80,75,70,65,60,55,40].index(st.session_state.form_data.get('att', 75))
             )
             
             achieve = st.selectbox(
                 "Achievement Band",
                 options=[90,85,80,75,70,65,60,55,40],
-                index=3  # Default to 75
+                index=[90,85,80,75,70,65,60,55,40].index(st.session_state.form_data.get('achieve', 75))
             )
             
             target = st.selectbox(
                 "Target Band",
                 options=[90,85,80,75,70,65,60,55,40],
-                index=3  # Default to 75
+                index=[90,85,80,75,70,65,60,55,40].index(st.session_state.form_data.get('target', 75))
             )
-            
-            # Show saved status
-            if st.session_state.form_data:
-                st.caption("✓ Using saved form data")
         
         attitude_target = st.text_area(
             "Optional Attitude Next Steps",
@@ -794,6 +861,7 @@ if app_mode == "Single Student":
             
             # Store in session state
             st.session_state.current_comment = comment
+            st.session_state.current_variant = None
             st.session_state.show_variant = False
             st.session_state.progress = 2
     
@@ -804,7 +872,7 @@ if app_mode == "Single Student":
         # Determine which comment to show
         if st.session_state.get('show_variant', False) and st.session_state.get('current_variant'):
             display_comment = st.session_state.current_variant
-            comment_source = "Variant"
+            comment_source = st.session_state.get('variant_label', 'Variant')
         else:
             display_comment = st.session_state.current_comment
             comment_source = "Original"
@@ -832,10 +900,6 @@ if app_mode == "Single Student":
             else:
                 st.warning("Near limit")
         
-        # Initialize all_comments if needed
-        if 'all_comments' not in st.session_state:
-            st.session_state.all_comments = []
-        
         # Add to all_comments list
         current_entry = {
             'name': st.session_state.form_data.get('name', 'Student'),
@@ -846,7 +910,15 @@ if app_mode == "Single Student":
         }
         
         # Check if this comment is already in the list
-        if not any(entry['comment'] == display_comment for entry in st.session_state.all_comments):
+        comment_exists = any(
+            entry['name'] == current_entry['name'] and 
+            entry['subject'] == current_entry['subject'] and 
+            entry['year'] == current_entry['year'] and
+            entry['comment'] == current_entry['comment']
+            for entry in st.session_state.all_comments
+        )
+        
+        if not comment_exists:
             st.session_state.all_comments.append(current_entry)
         
         # Action buttons
@@ -860,11 +932,24 @@ if app_mode == "Single Student":
                 # Get available variants
                 available_variants = get_available_variants(form_data['subject'], form_data['year'])
                 
-                # Pick a random variant (excluding current if we're showing variant)
-                if st.session_state.get('show_variant', False):
-                    available_variants = [v for v in available_variants if v != 2]  # Don't regenerate same variant
+                # Create student key for variant history
+                student_key = f"{form_data['name']}_{form_data['subject']}_{form_data['year']}"
                 
-                variant_num = random.choice(available_variants)
+                # Get used variants for this student
+                used_variants = st.session_state.variant_history.get(student_key, [])
+                
+                # Pick a variant not recently used
+                if len(available_variants) > 1:
+                    # Try to pick a variant not recently used
+                    unused_variants = [v for v in available_variants if v not in used_variants]
+                    if unused_variants:
+                        variant_num = random.choice(unused_variants)
+                    else:
+                        variant_num = random.choice(available_variants)
+                        # Clear history if all variants used
+                        st.session_state.variant_history[student_key] = []
+                else:
+                    variant_num = available_variants[0]
                 
                 # Generate variant comment
                 comment_variant = generate_comment(
@@ -882,10 +967,15 @@ if app_mode == "Single Student":
                 # Store variant
                 st.session_state.current_variant = comment_variant
                 st.session_state.show_variant = True
+                st.session_state.variant_label = f"Variant {1 if variant_num == 0 else 2}"
+                
+                # Update variant history
+                if student_key not in st.session_state.variant_history:
+                    st.session_state.variant_history[student_key] = []
+                st.session_state.variant_history[student_key].append(variant_num)
                 
                 # Show success message
-                variant_label = "Variant 1" if variant_num == 0 else "Variant 2"
-                st.success(f"✨ {variant_label} generated!")
+                st.success(f"✨ {st.session_state.variant_label} generated!")
                 st.rerun()
         
         with col_actions[2]:
@@ -943,9 +1033,6 @@ Sarah,Female,Science,8,85,90,85"""
                 st.dataframe(df.head())
             
             if st.button("🚀 Generate All Comments", type="primary"):
-                if 'all_comments' not in st.session_state:
-                    st.session_state.all_comments = []
-                
                 progress_bar = st.progress(0)
                 status_text = st.empty()
                 
@@ -1106,6 +1193,7 @@ if 'all_comments' in st.session_state and st.session_state.all_comments:
             st.session_state.current_comment = ""
             st.session_state.current_variant = ""
             st.session_state.show_variant = False
+            st.session_state.variant_history = {}
             st.session_state.progress = 1
             st.success("All comments cleared! Ready for new entries.")
             st.rerun()
