@@ -1,0 +1,116 @@
+# 📝 Variant Files Implementation Guide
+
+## ✅ Step 1: What You Need to Create
+
+For each statement file you want variants for, create 2 new files:
+
+### Example for Year 7 English:
+- `statements_year7_English.py` (already exists - keep as is)
+- `statements_year7_English_variant1.py` (NEW - copy structure, change wording)
+- `statements_year7_English_variant2.py` (NEW - copy structure, change wording)
+
+## 📋 Step 2: File Structure (Must Be IDENTICAL)
+
+Each variant file MUST have the EXACT same structure as the original:
+
+```python
+# statements_year7_English_variant1.py
+
+opening_phrases = [
+    "Throughout this term,",  # DIFFERENT WORDING
+    "During lessons this term,",  # DIFFERENT WORDING
+    # ... more phrases
+]
+
+attitude_bank = {
+    90: "demonstrated exceptional independence and curiosity in learning",  # DIFFERENT
+    85: "showed highly engaged and motivated approach to lessons",  # DIFFERENT
+    80: "participated actively and approached tasks with confidence",  # DIFFERENT
+    # ... same structure, different wording
+}
+
+reading_bank = {
+    90: "comprehended texts deeply and drew insightful conclusions",  # DIFFERENT
+    # ... etc
+}
+
+writing_bank = {
+    # ... same bands, different descriptions
+}
+
+reading_target_bank = {
+    # ... same bands, different targets
+}
+
+writing_target_bank = {
+    # ... same bands, different targets  
+}
+
+closer_bank = [
+    "Overall, steady development was evident throughout the term",  # DIFFERENT
+    # ... more closers
+]
+```
+
+## 🎯 Step 3: Which Files to Create Variants For
+
+**Priority 1 (Most Used):**
+- `statements_year7_English_variant1.py`
+- `statements_year7_English_variant2.py`
+- `statements_year8_English_variant1.py`
+- `statements_year8_English_variant2.py`
+
+**Priority 2 (If time):**
+- `statements_year7_science_variant1.py`
+- `statements_year7_science_variant2.py`
+- `statements_year8_science_variant1.py`
+- `statements_year8_science_variant2.py`
+
+**Priority 3 (Optional):**
+- Year 5 variants
+- Maths variants
+
+## ⚙️ Step 4: How the App Will Use Them
+
+When you click "🔄 Generate Variant":
+1. App checks if variant files exist
+2. Randomly picks variant 1 or 2 (or original if no variants)
+3. Generates completely different comment with same bands
+
+## ✅ Step 5: Testing
+
+After creating variant files:
+1. Upload them to your project
+2. Restart the app
+3. Generate a comment
+4. Click "Generate Variant" - should see different wording!
+5. If no variants found, button will show: "No variant files found"
+
+## 🚨 IMPORTANT Rules
+
+1. **Same structure** - All dictionaries must have same keys (90, 85, 80, etc.)
+2. **Same file naming** - Exact pattern: `original_name_variant1.py`
+3. **Different wording** - Change the text, not the structure
+4. **Keep it professional** - Maintain curriculum-aligned language
+
+## 💡 Pro Tip
+
+Use AI to help create variants:
+- Give it your original file
+- Ask: "Create variant1 with different professional wording, same structure, same bands"
+- Review for quality and curriculum alignment
+- Repeat for variant2
+
+## Example Prompt for AI:
+
+```
+Create a variant of this statement file. Keep the EXACT same structure 
+(same dictionary keys: 90, 85, 80, 75, 70, 65, 60, 55, 40) but use 
+different professional, curriculum-aligned wording for each statement.
+
+The variant should sound natural and professional for UK school reports.
+Maintain the same pedagogical level and tone.
+
+Original file:
+[paste your statements file here]
+```
