@@ -4,14 +4,48 @@
 # NOW WITH VARIANT SUPPORT for avoiding duplicate comments
 # =========================================
 
-import random
 import streamlit as st
-from docx import Document
-import tempfile
+import sys
 import os
+
+# Show loading message
+loading_placeholder = st.empty()
+loading_placeholder.info("🔄 Loading application...")
+
+# Try to import all required packages with detailed error messages
+try:
+    # Try to import docx (using docx package instead of python-docx)
+    import docx
+    from docx import Document
+    DOCX_AVAILABLE = True
+except ImportError:
+    DOCX_AVAILABLE = False
+    st.error("⚠️ Word export disabled: 'docx' package not installed")
+    st.info("Install with: pip install docx==0.2.4")
+
+try:
+    import pandas as pd
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    st.error("❌ 'pandas' package not installed")
+    st.stop()
+
+try:
+    import openpyxl
+    OPENPYXL_AVAILABLE = True
+except ImportError:
+    OPENPYXL_AVAILABLE = False
+    st.warning("⚠️ Excel features may be limited")
+
+# Clear loading message
+loading_placeholder.empty()
+
+# Now import other standard libraries
+import random
+import tempfile
 import time
 from datetime import datetime, timedelta
-import pandas as pd
 import io
 import re
 
@@ -221,6 +255,7 @@ try:
     
 except ImportError as e:
     st.error(f"Missing required statement files: {e}")
+    st.info("Make sure all statement files are in the same directory")
     st.stop()
 
 # ========== SECURITY FUNCTIONS ==========
@@ -594,14 +629,11 @@ with st.sidebar:
 col1, col2 = st.columns([1, 4])
 
 with col1:
-    try:
-        st.image("logo.png", use_column_width=True)
-    except:
-        st.markdown("""
-        <div style='text-align: center;'>
-            <div style='font-size: 72px;'>📚</div>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align: center;'>
+        <div style='font-size: 72px;'>📚</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 with col2:
     st.title("Multi-Subject Report Comment Generator")
@@ -976,28 +1008,32 @@ if 'all_comments' in st.session_state and st.session_state.all_comments:
     col_dl1, col_dl2, col_dl3 = st.columns(3)
     
     with col_dl1:
-        if st.button("📄 Word Document", use_container_width=True):
-            doc = Document()
-            doc.add_heading('Report Comments', 0)
-            doc.add_paragraph(f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
-            doc.add_paragraph(f'Total Students: {total_comments}')
-            doc.add_paragraph('')
-            
-            for entry in st.session_state.all_comments:
-                doc.add_heading(f"{entry['name']} - {entry['subject']} Year {entry['year']}", level=2)
-                doc.add_paragraph(entry['comment'])
+        if DOCX_AVAILABLE:
+            if st.button("📄 Word Document", use_container_width=True):
+                doc = Document()
+                doc.add_heading('Report Comments', 0)
+                doc.add_paragraph(f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
+                doc.add_paragraph(f'Total Students: {total_comments}')
                 doc.add_paragraph('')
-            
-            bio = io.BytesIO()
-            doc.save(bio)
-            
-            st.download_button(
-                label="⬇️ Download Word File",
-                data=bio.getvalue(),
-                file_name=f"report_comments_{datetime.now().strftime('%Y%m%d_%H%M')}.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                use_container_width=True
-            )
+                
+                for entry in st.session_state.all_comments:
+                    doc.add_heading(f"{entry['name']} - {entry['subject']} Year {entry['year']}", level=2)
+                    doc.add_paragraph(entry['comment'])
+                    doc.add_paragraph('')
+                
+                bio = io.BytesIO()
+                doc.save(bio)
+                
+                st.download_button(
+                    label="⬇️ Download Word File",
+                    data=bio.getvalue(),
+                    file_name=f"report_comments_{datetime.now().strftime('%Y%m%d_%H%M')}.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    use_container_width=True
+                )
+        else:
+            st.button("📄 Word Document (Disabled)", use_container_width=True, disabled=True)
+            st.caption("Word export requires 'docx' package")
     
     with col_dl2:
         if st.button("📊 CSV Export", use_container_width=True):
@@ -1056,3 +1092,13 @@ with footer_cols[1]:
         
         Need help? Contact support.
         """)
+
+# ========== PACKAGE INFO ==========
+with st.sidebar:
+    if st.checkbox("Show Package Info"):
+        st.markdown("---")
+        st.subheader("📦 Package Status")
+        st.write(f"✅ Streamlit: {st.__version__}")
+        st.write(f"✅ Pandas: {pd.__version__}")
+        st.write(f"✅ Openpyxl: {openpyxl.__version__ if OPENPYXL_AVAILABLE else 'Not available'}")
+        st.write(f"{'✅' if DOCX_AVAILABLE else '❌'} Docx: {'Available' if DOCX_AVAILABLE else 'Not available'}")
