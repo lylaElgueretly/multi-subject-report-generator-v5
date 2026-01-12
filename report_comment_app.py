@@ -1,7 +1,6 @@
 # =========================================
-# MULTI-SUBJECT REPORT COMMENT GENERATOR
-# Clean Minimal Version
-# Supports Year 5, 7 & 8; Subjects: English, Maths, Science
+# CommentCraft - International Kingdom College
+# Multi-Subject Report Comment Generator
 # =========================================
 
 import streamlit as st
@@ -33,8 +32,7 @@ except ImportError:
 # Import standard libraries
 import random
 import tempfile
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 import io
 import re
 
@@ -45,7 +43,7 @@ MAX_ROWS_PER_UPLOAD = 100
 
 # ========== PAGE CONFIG ==========
 st.set_page_config(
-    page_title="Report Comment Generator",
+    page_title="CommentCraft - IKC",
     page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -57,6 +55,7 @@ if 'app_initialized' not in st.session_state:
     st.session_state.app_initialized = True
     st.session_state.all_comments = []
     st.session_state.current_data = None
+    st.session_state.current_comment = None
 
 # ========== HELPER FUNCTIONS ==========
 def sanitize_input(text, max_length=100):
@@ -402,56 +401,122 @@ def generate_comment(subject, year, name, gender, att, achieve, target, attitude
     return comment
 
 # ========== APP LAYOUT ==========
-# Simple minimal CSS
+# Custom CSS for clean IKC branding
 st.markdown("""
 <style>
-    /* Remove all decorations */
+    /* Clean IKC theme */
     [data-testid="stDecoration"] {
         display: none;
     }
     
-    /* Clean buttons */
-    .stButton > button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 10px 20px;
+    /* Header styling */
+    .main-header {
+        color: #1a472a;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .sub-header {
+        color: #2e8b57;
+        text-align: center;
+        margin-bottom: 2rem;
         font-weight: 500;
     }
     
-    .stButton > button:hover {
-        background-color: #45a049;
-    }
-    
-    /* Secondary buttons */
-    .stButton > button[kind="secondary"] {
-        background-color: #FFC107;
-        color: black;
+    /* Green buttons for IKC */
+    .stButton > button {
+        background-color: #2e8b57;
+        color: white;
         border: none;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: background-color 0.3s;
     }
     
-    /* Clean form */
+    .stButton > button:hover {
+        background-color: #1a472a;
+    }
+    
+    /* Secondary buttons - Light green */
+    .stButton > button[kind="secondary"] {
+        background-color: #90EE90;
+        color: #1a472a;
+        border: 1px solid #2e8b57;
+    }
+    
+    /* Progress steps */
+    .step-container {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #2e8b57;
+    }
+    
+    .step-title {
+        color: #1a472a;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .step-description {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    /* Form styling */
     .stTextInput input, .stSelectbox div[data-baseweb="select"], 
     .stTextArea textarea {
         border: 1px solid #ddd;
         border-radius: 4px;
     }
     
-    /* Simple metrics */
+    /* Comment box */
+    .comment-box {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid #2e8b57;
+        margin: 1rem 0;
+    }
+    
+    /* Metrics */
     .stMetric {
         background-color: transparent;
         border: none;
+    }
+    
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #f0f7f4;
+    }
+    
+    /* Remove blue colors */
+    a {
+        color: #2e8b57 !important;
+    }
+    
+    /* IKC footer */
+    .ikc-footer {
+        text-align: center;
+        color: #666;
+        font-size: 0.8rem;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
-    st.markdown("### Navigation")
+    st.markdown("### CommentCraft")
+    st.markdown("---")
+    
     app_mode = st.radio(
-        "",
-        ["Single Student", "Batch Upload", "View Comments"],
+        "Navigation",
+        ["Single Student", "Batch Upload", "View & Export"],
         label_visibility="collapsed"
     )
     
@@ -462,37 +527,69 @@ with st.sidebar:
         st.session_state.app_initialized = True
         st.session_state.all_comments = []
         st.session_state.current_data = None
+        st.session_state.current_comment = None
         st.success("Data cleared")
         st.rerun()
 
-# Main content
-st.title("Report Comment Generator")
-st.markdown("Generate comments for Years 5, 7, 8 • English, Maths, Science")
+# Main header
+st.markdown('<h1 class="main-header">CommentCraft</h1>', unsafe_allow_html=True)
+st.markdown('<h3 class="sub-header">International Kingdom College</h3>', unsafe_allow_html=True)
+
+# Progress steps
+st.markdown("### Three Simple Steps")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("""
+    <div class="step-container">
+        <div class="step-title">1. Select</div>
+        <div class="step-description">Choose student details</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div class="step-container">
+        <div class="step-title">2. Generate</div>
+        <div class="step-description">Create the comment</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown("""
+    <div class="step-container">
+        <div class="step-title">3. Download</div>
+        <div class="step-description">Export your reports</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ========== SINGLE STUDENT MODE ==========
 if app_mode == "Single Student":
     st.markdown("---")
-    st.markdown("### Enter Student Details")
+    st.markdown("### Student Information")
     
-    # Simple form
+    # Form in columns
     col1, col2 = st.columns(2)
     
     with col1:
         subject = st.selectbox("Subject", ["English", "Maths", "Science"])
-        year = st.selectbox("Year", [5, 7, 8])
-        name = st.text_input("Student Name", placeholder="First name")
+        year = st.selectbox("Year Level", [5, 7, 8])
+        name = st.text_input("Student Name", placeholder="Enter student's name")
     
     with col2:
         gender = st.selectbox("Gender", ["Male", "Female"])
-        att = st.selectbox("Attitude Band", options=[90,85,80,75,70,65,60,55,40], index=3)
-        achieve = st.selectbox("Achievement Band", options=[90,85,80,75,70,65,60,55,40], index=3)
+        att = st.selectbox("Attitude", options=[90,85,80,75,70,65,60,55,40], index=3, 
+                          format_func=lambda x: f"{x}%")
+        achieve = st.selectbox("Achievement", options=[90,85,80,75,70,65,60,55,40], index=3,
+                             format_func=lambda x: f"{x}%")
     
-    target = st.selectbox("Target Band", options=[90,85,80,75,70,65,60,55,40], index=3)
+    target = st.selectbox("Target", options=[90,85,80,75,70,65,60,55,40], index=3,
+                         format_func=lambda x: f"{x}%")
     
     attitude_target = st.text_area(
-        "Optional Next Steps",
-        placeholder="E.g., continue to participate actively...",
-        height=60
+        "Personalized Next Steps (Optional)",
+        placeholder="Add specific targets for this student...",
+        height=80
     )
     
     # Generate button
@@ -513,7 +610,7 @@ if app_mode == "Single Student":
             }
             
             # Generate comment
-            with st.spinner("Generating..."):
+            with st.spinner("Crafting comment..."):
                 comment = generate_comment(
                     subject=subject,
                     year=year,
@@ -526,26 +623,27 @@ if app_mode == "Single Student":
                 )
                 
                 st.session_state.current_comment = comment
+                st.success("Comment generated!")
     
     # Display comment if generated
     if hasattr(st.session_state, 'current_comment') and st.session_state.current_comment:
         st.markdown("---")
         st.markdown("### Generated Comment")
         
-        # Display comment
-        st.text_area("", st.session_state.current_comment, height=150, label_visibility="collapsed")
+        # Display comment in styled box
+        st.markdown(f'<div class="comment-box">{st.session_state.current_comment}</div>', unsafe_allow_html=True)
         
-        # Action buttons in a row
-        col1, col2, col3 = st.columns(3)
+        # Action buttons
+        col_actions = st.columns([1, 1, 1, 1])
         
-        with col1:
-            if st.button("Copy", use_container_width=True):
+        with col_actions[0]:
+            if st.button("📋 Copy", use_container_width=True):
                 st.code(st.session_state.current_comment, language=None)
-                st.success("Ready to copy!")
+                st.success("Copied to clipboard!")
         
-        with col2:
-            if st.button("Generate Variant", use_container_width=True, type="secondary"):
-                # Generate new variant with different random selection
+        with col_actions[1]:
+            if st.button("🔄 Variant", use_container_width=True, type="secondary"):
+                # Generate new variant
                 data = st.session_state.current_data
                 new_comment = generate_comment(
                     subject=data['subject'],
@@ -560,8 +658,8 @@ if app_mode == "Single Student":
                 st.session_state.current_comment = new_comment
                 st.rerun()
         
-        with col3:
-            if st.button("Save & New", use_container_width=True):
+        with col_actions[2]:
+            if st.button("💾 Save", use_container_width=True):
                 # Save current comment
                 if st.session_state.current_data:
                     student_entry = {
@@ -572,37 +670,46 @@ if app_mode == "Single Student":
                         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M")
                     }
                     st.session_state.all_comments.append(student_entry)
-                
+                    st.success(f"Saved comment for {student_entry['name']}")
+        
+        with col_actions[3]:
+            if st.button("➕ New", use_container_width=True):
                 # Clear for new student
                 st.session_state.current_comment = None
                 st.session_state.current_data = None
                 st.rerun()
         
-        # Character count
+        # Statistics
         char_count = len(st.session_state.current_comment)
-        st.caption(f"Characters: {char_count}/{TARGET_CHARS} • Words: {len(st.session_state.current_comment.split())}")
+        col_stats = st.columns(3)
+        with col_stats[0]:
+            st.metric("Characters", f"{char_count}/{TARGET_CHARS}")
+        with col_stats[1]:
+            st.metric("Words", len(st.session_state.current_comment.split()))
+        with col_stats[2]:
+            status = "✅ Good" if char_count < TARGET_CHARS - 50 else "⚠️ Near limit"
+            st.metric("Status", status)
 
 # ========== BATCH UPLOAD MODE ==========
 elif app_mode == "Batch Upload":
     st.markdown("---")
-    st.markdown("### Upload CSV File")
+    st.markdown("### Batch Processing")
     
     st.info("""
-    **CSV Format:**  
-    Student Name, Gender, Subject, Year, Attitude, Achievement, Target  
-    Example: John, Male, English, 7, 75, 80, 85
+    **Upload a CSV file with student data.**  
+    Required columns: Student Name, Gender, Subject, Year, Attitude, Achievement, Target
     """)
     
     # Example CSV
     example_csv = """Student Name,Gender,Subject,Year,Attitude,Achievement,Target
-Sarah,Female,English,5,75,80,85
-John,Male,Maths,7,80,75,80
-Emma,Female,Science,8,85,90,85"""
+Sarah Jones,Female,English,5,75,80,85
+Mohamed Ahmed,Male,Maths,7,80,75,80
+Emma Wilson,Female,Science,8,85,90,85"""
     
     st.download_button(
-        "Download Example CSV",
+        "📥 Download Template",
         example_csv,
-        "example_students.csv",
+        "ikc_students_template.csv",
         "text/csv",
         use_container_width=True
     )
@@ -617,7 +724,7 @@ Emma,Female,Science,8,85,90,85"""
                 df = process_csv_securely(uploaded_file)
             
             if df is not None:
-                st.success(f"Loaded {len(df)} students")
+                st.success(f"✅ Loaded {len(df)} students")
                 
                 if st.button("Generate All Comments", use_container_width=True):
                     progress_bar = st.progress(0)
@@ -650,27 +757,29 @@ Emma,Female,Science,8,85,90,85"""
                             st.error(f"Error with row {idx + 1}: {e}")
                     
                     progress_bar.empty()
-                    st.success(f"Generated {len(df)} comments")
+                    st.success(f"✅ Generated {len(df)} comments")
 
-# ========== VIEW COMMENTS MODE ==========
-elif app_mode == "View Comments":
+# ========== VIEW & EXPORT MODE ==========
+elif app_mode == "View & Export":
     st.markdown("---")
-    st.markdown("### Saved Comments")
+    st.markdown("### Saved Comments & Export")
     
     if not st.session_state.all_comments:
         st.info("No comments saved yet. Generate some comments first.")
     else:
-        st.markdown(f"**Total: {len(st.session_state.all_comments)} comments**")
+        total_comments = len(st.session_state.all_comments)
+        st.markdown(f"**📊 Total Comments: {total_comments}**")
         
         # Export options
-        col1, col2 = st.columns(2)
+        st.markdown("#### Export Options")
+        col_export1, col_export2, col_export3 = st.columns(3)
         
-        with col1:
-            if DOCX_AVAILABLE and st.button("Export to Word", use_container_width=True):
+        with col_export1:
+            if DOCX_AVAILABLE and st.button("📝 Word Document", use_container_width=True):
                 doc = Document()
-                doc.add_heading('Report Comments', 0)
-                doc.add_paragraph(f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
-                doc.add_paragraph(f'Total: {len(st.session_state.all_comments)}')
+                doc.add_heading('IKC Report Comments', 0)
+                doc.add_paragraph(f'Generated: {datetime.now().strftime("%d %B %Y %H:%M")}')
+                doc.add_paragraph(f'Total Comments: {total_comments}')
                 doc.add_paragraph('')
                 
                 for entry in st.session_state.all_comments:
@@ -682,50 +791,53 @@ elif app_mode == "View Comments":
                 doc.save(bio)
                 
                 st.download_button(
-                    "Download .docx",
+                    "⬇️ Download .docx",
                     bio.getvalue(),
-                    f"comments_{datetime.now().strftime('%Y%m%d')}.docx",
+                    f"ikc_comments_{datetime.now().strftime('%Y%m%d')}.docx",
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     use_container_width=True
                 )
             elif not DOCX_AVAILABLE:
-                st.button("Word Export (Disabled)", disabled=True, use_container_width=True)
-                st.caption("Install 'docx' package")
+                st.button("Word (Disabled)", disabled=True, use_container_width=True)
+                st.caption("Install 'python-docx' package")
         
-        with col2:
-            if st.button("Export to CSV", use_container_width=True):
+        with col_export2:
+            if st.button("📊 CSV Export", use_container_width=True):
                 csv_data = []
                 for entry in st.session_state.all_comments:
                     csv_data.append({
                         'Student': entry['name'],
                         'Subject': entry['subject'],
                         'Year': entry['year'],
-                        'Comment': entry['comment']
+                        'Comment': entry['comment'],
+                        'Generated': entry['timestamp']
                     })
                 
                 df_export = pd.DataFrame(csv_data)
                 csv_bytes = df_export.to_csv(index=False).encode('utf-8')
                 
                 st.download_button(
-                    "Download .csv",
+                    "⬇️ Download .csv",
                     csv_bytes,
-                    f"comments_{datetime.now().strftime('%Y%m%d')}.csv",
+                    f"ikc_comments_{datetime.now().strftime('%Y%m%d')}.csv",
                     "text/csv",
                     use_container_width=True
                 )
         
+        with col_export3:
+            if st.button("🗑️ Clear All", use_container_width=True, type="secondary"):
+                st.session_state.all_comments = []
+                st.rerun()
+        
         # Display comments
         st.markdown("---")
+        st.markdown("#### Preview Comments")
+        
         for idx, entry in enumerate(st.session_state.all_comments, 1):
             with st.expander(f"{idx}. {entry['name']} - {entry['subject']} Year {entry['year']}"):
-                st.write(entry['comment'])
+                st.markdown(f'<div class="comment-box">{entry["comment"]}</div>', unsafe_allow_html=True)
                 st.caption(f"Generated: {entry['timestamp']}")
-        
-        # Clear button
-        if st.button("Clear All Comments", type="secondary", use_container_width=True):
-            st.session_state.all_comments = []
-            st.rerun()
 
 # ========== FOOTER ==========
 st.markdown("---")
-st.caption("Report Generator • Secure Local Processing • No Data Storage")
+st.markdown('<div class="ikc-footer">CommentCraft • International Kingdom College • Secure Local Processing</div>', unsafe_allow_html=True)
