@@ -72,8 +72,8 @@ if 'app_initialized' not in st.session_state:
         st.session_state.form_data = {}
     if 'all_comments' not in st.session_state:
         st.session_state.all_comments = []
-    if 'variant_history' not in st.session_state:
-        st.session_state.variant_history = {}  # Track variant usage per student
+    if 'variant_tracker' not in st.session_state:
+        st.session_state.variant_tracker = {}
 
 # ========== HELPER FUNCTIONS ==========
 def apply_british_spelling(text):
@@ -403,12 +403,12 @@ except ImportError as e:
 def get_statement_banks(subject, year, variant=0):
     """
     Get statement banks based on subject, year, and variant.
-    variant: 0 = variant1, 2 = variant2
+    variant: 0 = variant1, 1 = variant2
     """
     
     # Year 5 English
     if year == 5 and subject == "English":
-        if variant == 2:
+        if variant == 1:
             return (opening_5_eng_v2, attitude_5_eng_v2, reading_5_eng_v2, writing_5_eng_v2,
                    target_5_eng_v2, target_write_5_eng_v2, closer_5_eng_v2)
         else:
@@ -417,7 +417,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 5 Maths
     elif year == 5 and subject == "Maths":
-        if variant == 2:
+        if variant == 1:
             return (opening_5_maths_v2, attitude_5_maths_v2, number_5_maths_v2, None,
                    target_5_maths_v2, None, closer_5_maths_v2)
         else:
@@ -426,7 +426,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 5 Science
     elif year == 5 and subject == "Science":
-        if variant == 2:
+        if variant == 1:
             return (opening_5_sci_v2, attitude_5_sci_v2, science_5_sci_v2, None,
                    target_5_sci_v2, None, closer_5_sci_v2)
         else:
@@ -435,7 +435,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 7 English
     elif year == 7 and subject == "English":
-        if variant == 2:
+        if variant == 1:
             return (opening_7_eng_v2, attitude_7_eng_v2, reading_7_eng_v2, writing_7_eng_v2,
                    target_7_eng_v2, target_write_7_eng_v2, closer_7_eng_v2)
         else:
@@ -444,7 +444,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 7 Maths
     elif year == 7 and subject == "Maths":
-        if variant == 2:
+        if variant == 1:
             return (opening_7_maths_v2, attitude_7_maths_v2, number_7_maths_v2, None,
                    target_7_maths_v2, None, closer_7_maths_v2)
         else:
@@ -453,7 +453,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 7 Science
     elif year == 7 and subject == "Science":
-        if variant == 2:
+        if variant == 1:
             return (opening_7_sci_v2, attitude_7_sci_v2, science_7_sci_v2, None,
                    target_7_sci_v2, None, closer_7_sci_v2)
         else:
@@ -462,7 +462,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 8 English
     elif year == 8 and subject == "English":
-        if variant == 2:
+        if variant == 1:
             return (opening_8_eng_v2, attitude_8_eng_v2, reading_8_eng_v2, writing_8_eng_v2,
                    target_8_eng_v2, target_write_8_eng_v2, closer_8_eng_v2)
         else:
@@ -471,7 +471,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 8 Maths
     elif year == 8 and subject == "Maths":
-        if variant == 2:
+        if variant == 1:
             return (opening_8_maths_v2, attitude_8_maths_v2, maths_8_maths_v2, None,
                    target_8_maths_v2, None, closer_8_maths_v2)
         else:
@@ -480,7 +480,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 8 Science
     elif year == 8 and subject == "Science":
-        if variant == 2:
+        if variant == 1:
             return (opening_8_sci_v2, attitude_8_sci_v2, science_8_sci_v2, None,
                    target_8_sci_v2, None, closer_8_sci_v2)
         else:
@@ -493,7 +493,7 @@ def get_statement_banks(subject, year, variant=0):
 def generate_comment(subject, year, name, gender, att, achieve, target, attitude_target="", variant=0):
     """
     Generate report comment with optional variant support.
-    variant: 0 = variant1, 2 = variant2
+    variant: 0 = variant1, 1 = variant2
     """
     p, p_poss = get_pronouns(gender)
     name = sanitize_input(name)
@@ -633,23 +633,23 @@ def get_available_variants(subject, year):
     available = [0]  # 0 = variant1 always available
     
     if year == 5 and subject == "English":
-        if opening_5_eng_v2: available.append(2)
+        if opening_5_eng_v2: available.append(1)
     elif year == 5 and subject == "Maths":
-        if opening_5_maths_v2: available.append(2)
+        if opening_5_maths_v2: available.append(1)
     elif year == 5 and subject == "Science":
-        if opening_5_sci_v2: available.append(2)
+        if opening_5_sci_v2: available.append(1)
     elif year == 7 and subject == "English":
-        if opening_7_eng_v2: available.append(2)
+        if opening_7_eng_v2: available.append(1)
     elif year == 7 and subject == "Maths":
-        if opening_7_maths_v2: available.append(2)
+        if opening_7_maths_v2: available.append(1)
     elif year == 7 and subject == "Science":
-        if opening_7_sci_v2: available.append(2)
+        if opening_7_sci_v2: available.append(1)
     elif year == 8 and subject == "English":
-        if opening_8_eng_v2: available.append(2)
+        if opening_8_eng_v2: available.append(1)
     elif year == 8 and subject == "Maths":
-        if opening_8_maths_v2: available.append(2)
+        if opening_8_maths_v2: available.append(1)
     elif year == 8 and subject == "Science":
-        if opening_8_sci_v2: available.append(2)
+        if opening_8_sci_v2: available.append(1)
     
     return available
 
@@ -681,7 +681,7 @@ with st.sidebar:
         st.session_state.last_upload_time = datetime.now()
         st.session_state.form_data = {}
         st.session_state.all_comments = []
-        st.session_state.variant_history = {}
+        st.session_state.variant_tracker = {}
         st.success("All data cleared!")
         st.rerun()
     
@@ -746,81 +746,29 @@ st.markdown("<br>", unsafe_allow_html=True)
 if app_mode == "Single Student":
     st.subheader("👤 Single Student Entry")
     
-    # Add reset settings option
-    col_header1, col_header2 = st.columns([3, 1])
-    with col_header2:
-        if st.button("🔄 Reset Form", help="Clear all form data", use_container_width=True):
-            st.session_state.form_data = {}
-            st.success("Form cleared!")
-            st.rerun()
-    
     # Initialize form data in session state
     if 'form_data' not in st.session_state:
-        st.session_state.form_data = {
-            'subject': 'English',
-            'year': 7,
-            'name': '',
-            'gender': 'Male',
-            'att': 75,
-            'achieve': 75,
-            'target': 75,
-            'attitude_target': ''
-        }
+        st.session_state.form_data = {}
     
     # Create form
     with st.form(key="student_form"):
         col1, col2 = st.columns(2)
         
         with col1:
-            # Use stored form data or defaults
-            subject = st.selectbox(
-                "Subject", 
-                ["English", "Maths", "Science"],
-                index=["English", "Maths", "Science"].index(st.session_state.form_data.get('subject', 'English'))
-            )
-            
-            year = st.selectbox(
-                "Year", 
-                [5, 7, 8],
-                index=[5, 7, 8].index(st.session_state.form_data.get('year', 7))
-            )
-            
-            name = st.text_input(
-                "Student Name", 
-                placeholder="Enter first name only",
-                value=st.session_state.form_data.get('name', '')
-            )
-            
-            gender = st.selectbox(
-                "Gender", 
-                ["Male", "Female"],
-                index=0 if st.session_state.form_data.get('gender', 'Male') == 'Male' else 1
-            )
+            subject = st.selectbox("Subject", ["English", "Maths", "Science"])
+            year = st.selectbox("Year", [5, 7, 8])
+            name = st.text_input("Student Name", placeholder="Enter first name only")
+            gender = st.selectbox("Gender", ["Male", "Female"])
         
         with col2:
-            att = st.selectbox(
-                "Attitude Band", 
-                options=[90,85,80,75,70,65,60,55,40],
-                index=[90,85,80,75,70,65,60,55,40].index(st.session_state.form_data.get('att', 75))
-            )
-            
-            achieve = st.selectbox(
-                "Achievement Band",
-                options=[90,85,80,75,70,65,60,55,40],
-                index=[90,85,80,75,70,65,60,55,40].index(st.session_state.form_data.get('achieve', 75))
-            )
-            
-            target = st.selectbox(
-                "Target Band",
-                options=[90,85,80,75,70,65,60,55,40],
-                index=[90,85,80,75,70,65,60,55,40].index(st.session_state.form_data.get('target', 75))
-            )
+            att = st.selectbox("Attitude Band", options=[90,85,80,75,70,65,60,55,40], index=3)
+            achieve = st.selectbox("Achievement Band", options=[90,85,80,75,70,65,60,55,40], index=3)
+            target = st.selectbox("Target Band", options=[90,85,80,75,70,65,60,55,40], index=3)
         
         attitude_target = st.text_area(
             "Optional Attitude Next Steps",
             placeholder="E.g., continue to participate actively in class discussions...",
-            height=60,
-            value=st.session_state.form_data.get('attitude_target', '')
+            height=60
         )
         
         col_submit = st.columns([3, 1])
@@ -845,7 +793,7 @@ if app_mode == "Single Student":
             'attitude_target': attitude_target
         }
         
-        # Generate comment
+        # Generate original comment (variant 0)
         with st.spinner("Generating comment..."):
             comment = generate_comment(
                 subject=subject,
@@ -866,21 +814,23 @@ if app_mode == "Single Student":
             st.session_state.progress = 2
     
     # Show generated comment if it exists
-    if 'current_comment' in st.session_state and st.session_state.current_comment:
+    if 'form_data' in st.session_state and st.session_state.form_data and 'current_comment' in st.session_state:
+        form_data = st.session_state.form_data
+        
         st.subheader("📝 Generated Comment")
         
         # Determine which comment to show
         if st.session_state.get('show_variant', False) and st.session_state.get('current_variant'):
             display_comment = st.session_state.current_variant
-            comment_source = st.session_state.get('variant_label', 'Variant')
+            comment_source = "Variant Comment"
         else:
             display_comment = st.session_state.current_comment
-            comment_source = "Original"
+            comment_source = "Original Comment"
         
         # Display comment
         col_comment, col_copy = st.columns([4, 1])
         with col_comment:
-            st.text_area(f"{comment_source} Comment", display_comment, height=200, key="comment_display")
+            st.text_area(comment_source, display_comment, height=200, key="comment_display")
         with col_copy:
             st.markdown("<br>", unsafe_allow_html=True)
             if st.button("📋 Copy", use_container_width=True, help="Copy comment to clipboard"):
@@ -889,7 +839,7 @@ if app_mode == "Single Student":
         
         # Statistics
         char_count = len(display_comment)
-        col_stats = st.columns(4)
+        col_stats = st.columns(3)
         with col_stats[0]:
             st.metric("Character Count", f"{char_count}/{TARGET_CHARS}")
         with col_stats[1]:
@@ -902,21 +852,23 @@ if app_mode == "Single Student":
         
         # Add to all_comments list
         current_entry = {
-            'name': st.session_state.form_data.get('name', 'Student'),
-            'subject': st.session_state.form_data.get('subject', 'English'),
-            'year': st.session_state.form_data.get('year', 7),
+            'name': form_data.get('name', 'Student'),
+            'subject': form_data.get('subject', 'English'),
+            'year': form_data.get('year', 7),
             'comment': display_comment,
-            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M")
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M"),
+            'variant': 'Variant' if st.session_state.get('show_variant', False) else 'Original'
         }
         
-        # Check if this comment is already in the list
-        comment_exists = any(
-            entry['name'] == current_entry['name'] and 
-            entry['subject'] == current_entry['subject'] and 
-            entry['year'] == current_entry['year'] and
-            entry['comment'] == current_entry['comment']
-            for entry in st.session_state.all_comments
-        )
+        # Check if this exact comment is already in the list
+        comment_exists = False
+        for entry in st.session_state.all_comments:
+            if (entry['name'] == current_entry['name'] and 
+                entry['subject'] == current_entry['subject'] and 
+                entry['year'] == current_entry['year'] and
+                entry['comment'] == current_entry['comment']):
+                comment_exists = True
+                break
         
         if not comment_exists:
             st.session_state.all_comments.append(current_entry)
@@ -932,24 +884,22 @@ if app_mode == "Single Student":
                 # Get available variants
                 available_variants = get_available_variants(form_data['subject'], form_data['year'])
                 
-                # Create student key for variant history
+                # Create a unique key for this student
                 student_key = f"{form_data['name']}_{form_data['subject']}_{form_data['year']}"
                 
-                # Get used variants for this student
-                used_variants = st.session_state.variant_history.get(student_key, [])
+                # Initialize variant tracker for this student if not exists
+                if student_key not in st.session_state.variant_tracker:
+                    st.session_state.variant_tracker[student_key] = {'last_variant': 0, 'count': 0}
                 
-                # Pick a variant not recently used
-                if len(available_variants) > 1:
-                    # Try to pick a variant not recently used
-                    unused_variants = [v for v in available_variants if v not in used_variants]
-                    if unused_variants:
-                        variant_num = random.choice(unused_variants)
-                    else:
-                        variant_num = random.choice(available_variants)
-                        # Clear history if all variants used
-                        st.session_state.variant_history[student_key] = []
-                else:
-                    variant_num = available_variants[0]
+                # Get the tracker for this student
+                tracker = st.session_state.variant_tracker[student_key]
+                
+                # Always use variant 1 (the second variant) when clicking Generate Variant
+                variant_num = 1 if 1 in available_variants else 0
+                
+                # Update tracker
+                tracker['last_variant'] = variant_num
+                tracker['count'] += 1
                 
                 # Generate variant comment
                 comment_variant = generate_comment(
@@ -967,20 +917,16 @@ if app_mode == "Single Student":
                 # Store variant
                 st.session_state.current_variant = comment_variant
                 st.session_state.show_variant = True
-                st.session_state.variant_label = f"Variant {1 if variant_num == 0 else 2}"
-                
-                # Update variant history
-                if student_key not in st.session_state.variant_history:
-                    st.session_state.variant_history[student_key] = []
-                st.session_state.variant_history[student_key].append(variant_num)
+                st.session_state.variant_num = variant_num
                 
                 # Show success message
-                st.success(f"✨ {st.session_state.variant_label} generated!")
+                variant_label = "Variant 1" if variant_num == 0 else "Variant 2"
+                st.success(f"✨ {variant_label} generated with different wording!")
                 st.rerun()
         
         with col_actions[2]:
             if st.button("➕ Add Another Student", type="primary", use_container_width=True):
-                # Keep form data but clear comments
+                # Clear current comments but keep form data
                 st.session_state.current_comment = ""
                 st.session_state.current_variant = ""
                 st.session_state.show_variant = False
@@ -1129,7 +1075,8 @@ if 'all_comments' in st.session_state and st.session_state.all_comments:
     
     with st.expander(f"👁️ Preview All Comments ({total_comments})"):
         for idx, entry in enumerate(st.session_state.all_comments, 1):
-            st.markdown(f"**{idx}. {entry['name']}** ({entry['subject']} Year {entry['year']})")
+            variant_label = f" ({entry.get('variant', '')})" if 'variant' in entry else ''
+            st.markdown(f"**{idx}. {entry['name']}** ({entry['subject']} Year {entry['year']}){variant_label}")
             st.write(entry['comment'])
             st.markdown("---")
     
@@ -1193,7 +1140,7 @@ if 'all_comments' in st.session_state and st.session_state.all_comments:
             st.session_state.current_comment = ""
             st.session_state.current_variant = ""
             st.session_state.show_variant = False
-            st.session_state.variant_history = {}
+            st.session_state.variant_tracker = {}
             st.session_state.progress = 1
             st.success("All comments cleared! Ready for new entries.")
             st.rerun()
