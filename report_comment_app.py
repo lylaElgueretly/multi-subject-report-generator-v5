@@ -589,6 +589,7 @@ with st.sidebar:
         st.session_state.upload_count = 0
         st.session_state.last_upload_time = datetime.now()
         st.session_state.current_comments = {}
+        st.session_state.selected_comments = []
         st.success("All data cleared!")
         st.rerun()
 
@@ -720,7 +721,7 @@ if app_mode == "Single Student":
 
         col_submit = st.columns([4, 1])
         with col_submit[1]:
-            submitted = st.form_submit_button("🚀 Generate Comment", use_container_width=True)
+            submitted = st.form_submit_button("🚀 Generate Both Variants", use_container_width=True)
 
     if submitted and name:
         if not validate_upload_rate():
@@ -752,7 +753,7 @@ if app_mode == "Single Student":
                 'year': year,
                 'variant1': comment_v1,
                 'variant2': comment_v2,
-                'selected_variant': None  # To track which variant is selected
+                'selected_variants': []  # To track which variants are selected
             }
 
         st.session_state.progress = 2
@@ -760,4 +761,10 @@ if app_mode == "Single Student":
 
     # Display generated comments if they exist
     if st.session_state.current_comments:
-        st.subheader("📝 Generated Comment Variants
+        st.subheader("📝 Generated Comment Variants")
+        
+        current = st.session_state.current_comments
+        name = current['name']
+        subject = current['subject']
+        year = current['year']
+        comment_v1 = current['variant1']
