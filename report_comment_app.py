@@ -39,8 +39,8 @@ if 'app_initialized' not in st.session_state:
 
 # ========== IMPORT STATEMENTS ==========
 try:
-    # Year 5 English - Original
-    from statements_year5_English import (
+    # Year 5 English - Variant 1
+    from statements_year5_English_variant1 import (
         opening_phrases as opening_5_eng,
         attitude_bank as attitude_5_eng,
         reading_bank as reading_5_eng,
@@ -50,35 +50,19 @@ try:
         closer_bank as closer_5_eng
     )
     
-    # Year 5 English - Variants (optional)
-    try:
-        from statements_year5_English_variant1 import (
-            opening_phrases as opening_5_eng_v1,
-            attitude_bank as attitude_5_eng_v1,
-            reading_bank as reading_5_eng_v1,
-            writing_bank as writing_5_eng_v1,
-            reading_target_bank as target_5_eng_v1,
-            writing_target_bank as target_write_5_eng_v1,
-            closer_bank as closer_5_eng_v1
-        )
-    except ImportError:
-        opening_5_eng_v1 = None
+    # Year 5 English - Variant 2
+    from statements_year5_English_variant2 import (
+        opening_phrases as opening_5_eng_v2,
+        attitude_bank as attitude_5_eng_v2,
+        reading_bank as reading_5_eng_v2,
+        writing_bank as writing_5_eng_v2,
+        reading_target_bank as target_5_eng_v2,
+        writing_target_bank as target_write_5_eng_v2,
+        closer_bank as closer_5_eng_v2
+    )
     
-    try:
-        from statements_year5_English_variant2 import (
-            opening_phrases as opening_5_eng_v2,
-            attitude_bank as attitude_5_eng_v2,
-            reading_bank as reading_5_eng_v2,
-            writing_bank as writing_5_eng_v2,
-            reading_target_bank as target_5_eng_v2,
-            writing_target_bank as target_write_5_eng_v2,
-            closer_bank as closer_5_eng_v2
-        )
-    except ImportError:
-        opening_5_eng_v2 = None
-    
-    # Year 5 Maths - Original
-    from statements_year5_Maths import (
+    # Year 5 Maths - Variant 1
+    from statements_year5_Maths_variant1 import (
         opening_phrases as opening_5_maths,
         attitude_bank as attitude_5_maths,
         number_bank as number_5_maths,
@@ -87,8 +71,18 @@ try:
         closer_bank as closer_5_maths
     )
     
-    # Year 5 Science - Original
-    from statements_year5_Science import (
+    # Year 5 Maths - Variant 2
+    from statements_year5_Maths_variant2 import (
+        opening_phrases as opening_5_maths_v2,
+        attitude_bank as attitude_5_maths_v2,
+        number_bank as number_5_maths_v2,
+        problem_solving_bank as problem_5_maths_v2,
+        target_bank as target_5_maths_v2,
+        closer_bank as closer_5_maths_v2
+    )
+    
+    # Year 5 Science - Variant 1
+    from statements_year5_Science_variant1 import (
         opening_phrases as opening_5_sci,
         attitude_bank as attitude_5_sci,
         science_bank as science_5_sci,
@@ -96,8 +90,17 @@ try:
         closer_bank as closer_5_sci
     )
     
-    # Year 7 English - Original
-    from statements_year7_English import (
+    # Year 5 Science - Variant 2
+    from statements_year5_Science_variant2 import (
+        opening_phrases as opening_5_sci_v2,
+        attitude_bank as attitude_5_sci_v2,
+        science_bank as science_5_sci_v2,
+        target_bank as target_5_sci_v2,
+        closer_bank as closer_5_sci_v2
+    )
+    
+    # Year 7 English - Variant 1
+    from statements_year7_English_variant1 import (
         opening_phrases as opening_7_eng,
         attitude_bank as attitude_7_eng,
         reading_bank as reading_7_eng,
@@ -107,35 +110,19 @@ try:
         closer_bank as closer_7_eng
     )
     
-    # Year 7 English - Variants (optional)
-    try:
-        from statements_year7_English_variant1 import (
-            opening_phrases as opening_7_eng_v1,
-            attitude_bank as attitude_7_eng_v1,
-            reading_bank as reading_7_eng_v1,
-            writing_bank as writing_7_eng_v1,
-            reading_target_bank as target_7_eng_v1,
-            writing_target_bank as target_write_7_eng_v1,
-            closer_bank as closer_7_eng_v1
-        )
-    except ImportError:
-        opening_7_eng_v1 = None
+    # Year 7 English - Variant 2
+    from statements_year7_English_variant2 import (
+        opening_phrases as opening_7_eng_v2,
+        attitude_bank as attitude_7_eng_v2,
+        reading_bank as reading_7_eng_v2,
+        writing_bank as writing_7_eng_v2,
+        reading_target_bank as target_7_eng_v2,
+        writing_target_bank as target_write_7_eng_v2,
+        closer_bank as closer_7_eng_v2
+    )
     
-    try:
-        from statements_year7_English_variant2 import (
-            opening_phrases as opening_7_eng_v2,
-            attitude_bank as attitude_7_eng_v2,
-            reading_bank as reading_7_eng_v2,
-            writing_bank as writing_7_eng_v2,
-            reading_target_bank as target_7_eng_v2,
-            writing_target_bank as target_write_7_eng_v2,
-            closer_bank as closer_7_eng_v2
-        )
-    except ImportError:
-        opening_7_eng_v2 = None
-    
-    # Year 7 Maths - Original
-    from statements_year7_Maths import (
+    # Year 7 Maths - Variant 1
+    from statements_year7_Maths_variant1 import (
         opening_phrases as opening_7_maths,
         attitude_bank as attitude_7_maths,
         number_and_algebra_bank as number_7_maths,
@@ -145,8 +132,19 @@ try:
         closer_bank as closer_7_maths
     )
     
-    # Year 7 Science - Original
-    from statements_year7_science import (
+    # Year 7 Maths - Variant 2
+    from statements_year7_Maths_variant2 import (
+        opening_phrases as opening_7_maths_v2,
+        attitude_bank as attitude_7_maths_v2,
+        number_and_algebra_bank as number_7_maths_v2,
+        geometry_and_measurement_bank as geometry_7_maths_v2,
+        problem_solving_and_reasoning_bank as problem_7_maths_v2,
+        target_bank as target_7_maths_v2,
+        closer_bank as closer_7_maths_v2
+    )
+    
+    # Year 7 Science - Variant 1
+    from statements_year7_science_variant1 import (
         opening_phrases as opening_7_sci,
         attitude_bank as attitude_7_sci,
         science_bank as science_7_sci,
@@ -154,31 +152,17 @@ try:
         closer_bank as closer_7_sci
     )
     
-    # Year 7 Science - Variants (optional)
-    try:
-        from statements_year7_science_variant1 import (
-            opening_phrases as opening_7_sci_v1,
-            attitude_bank as attitude_7_sci_v1,
-            science_bank as science_7_sci_v1,
-            target_bank as target_7_sci_v1,
-            closer_bank as closer_7_sci_v1
-        )
-    except ImportError:
-        opening_7_sci_v1 = None
+    # Year 7 Science - Variant 2
+    from statements_year7_science_variant2 import (
+        opening_phrases as opening_7_sci_v2,
+        attitude_bank as attitude_7_sci_v2,
+        science_bank as science_7_sci_v2,
+        target_bank as target_7_sci_v2,
+        closer_bank as closer_7_sci_v2
+    )
     
-    try:
-        from statements_year7_science_variant2 import (
-            opening_phrases as opening_7_sci_v2,
-            attitude_bank as attitude_7_sci_v2,
-            science_bank as science_7_sci_v2,
-            target_bank as target_7_sci_v2,
-            closer_bank as closer_7_sci_v2
-        )
-    except ImportError:
-        opening_7_sci_v2 = None
-    
-    # Year 8 English - Original
-    from statements_year8_English import (
+    # Year 8 English - Variant 1
+    from statements_year8_English_variant1 import (
         opening_phrases as opening_8_eng,
         attitude_bank as attitude_8_eng,
         reading_bank as reading_8_eng,
@@ -188,35 +172,19 @@ try:
         closer_bank as closer_8_eng
     )
     
-    # Year 8 English - Variants (optional)
-    try:
-        from statements_year8_English_variant1 import (
-            opening_phrases as opening_8_eng_v1,
-            attitude_bank as attitude_8_eng_v1,
-            reading_bank as reading_8_eng_v1,
-            writing_bank as writing_8_eng_v1,
-            reading_target_bank as target_8_eng_v1,
-            writing_target_bank as target_write_8_eng_v1,
-            closer_bank as closer_8_eng_v1
-        )
-    except ImportError:
-        opening_8_eng_v1 = None
+    # Year 8 English - Variant 2
+    from statements_year8_English_variant2 import (
+        opening_phrases as opening_8_eng_v2,
+        attitude_bank as attitude_8_eng_v2,
+        reading_bank as reading_8_eng_v2,
+        writing_bank as writing_8_eng_v2,
+        reading_target_bank as target_8_eng_v2,
+        writing_target_bank as target_write_8_eng_v2,
+        closer_bank as closer_8_eng_v2
+    )
     
-    try:
-        from statements_year8_English_variant2 import (
-            opening_phrases as opening_8_eng_v2,
-            attitude_bank as attitude_8_eng_v2,
-            reading_bank as reading_8_eng_v2,
-            writing_bank as writing_8_eng_v2,
-            reading_target_bank as target_8_eng_v2,
-            writing_target_bank as target_write_8_eng_v2,
-            closer_bank as closer_8_eng_v2
-        )
-    except ImportError:
-        opening_8_eng_v2 = None
-    
-    # Year 8 Maths - Original
-    from statements_year8_Maths import (
+    # Year 8 Maths - Variant 1
+    from statements_year8_Maths_variant1 import (
         opening_phrases as opening_8_maths,
         attitude_bank as attitude_8_maths,
         maths_bank as maths_8_maths,
@@ -224,8 +192,17 @@ try:
         closer_bank as closer_8_maths
     )
     
-    # Year 8 Science - Original
-    from statements_year8_science import (
+    # Year 8 Maths - Variant 2
+    from statements_year8_Maths_variant2 import (
+        opening_phrases as opening_8_maths_v2,
+        attitude_bank as attitude_8_maths_v2,
+        maths_bank as maths_8_maths_v2,
+        target_bank as target_8_maths_v2,
+        closer_bank as closer_8_maths_v2
+    )
+    
+    # Year 8 Science - Variant 1
+    from statements_year8_science_variant1 import (
         opening_phrases as opening_8_sci,
         attitude_bank as attitude_8_sci,
         science_bank as science_8_sci,
@@ -233,28 +210,14 @@ try:
         closer_bank as closer_8_sci
     )
     
-    # Year 8 Science - Variants (optional)
-    try:
-        from statements_year8_science_variant1 import (
-            opening_phrases as opening_8_sci_v1,
-            attitude_bank as attitude_8_sci_v1,
-            science_bank as science_8_sci_v1,
-            target_bank as target_8_sci_v1,
-            closer_bank as closer_8_sci_v1
-        )
-    except ImportError:
-        opening_8_sci_v1 = None
-    
-    try:
-        from statements_year8_science_variant2 import (
-            opening_phrases as opening_8_sci_v2,
-            attitude_bank as attitude_8_sci_v2,
-            science_bank as science_8_sci_v2,
-            target_bank as target_8_sci_v2,
-            closer_bank as closer_8_sci_v2
-        )
-    except ImportError:
-        opening_8_sci_v2 = None
+    # Year 8 Science - Variant 2
+    from statements_year8_science_variant2 import (
+        opening_phrases as opening_8_sci_v2,
+        attitude_bank as attitude_8_sci_v2,
+        science_bank as science_8_sci_v2,
+        target_bank as target_8_sci_v2,
+        closer_bank as closer_8_sci_v2
+    )
     
 except ImportError as e:
     st.error(f"Missing required statement files: {e}")
@@ -347,15 +310,12 @@ def fix_pronouns_in_text(text, pronoun, possessive):
 def get_statement_banks(subject, year, variant=0):
     """
     Get statement banks based on subject, year, and variant.
-    Returns: (opening, attitude, reading/achievement, writing, reading_target, writing_target, closer)
+    variant: 0 = variant1, 2 = variant2
     """
     
     # Year 5 English
     if year == 5 and subject == "English":
-        if variant == 1 and opening_5_eng_v1:
-            return (opening_5_eng_v1, attitude_5_eng_v1, reading_5_eng_v1, writing_5_eng_v1,
-                   target_5_eng_v1, target_write_5_eng_v1, closer_5_eng_v1)
-        elif variant == 2 and opening_5_eng_v2:
+        if variant == 2:
             return (opening_5_eng_v2, attitude_5_eng_v2, reading_5_eng_v2, writing_5_eng_v2,
                    target_5_eng_v2, target_write_5_eng_v2, closer_5_eng_v2)
         else:
@@ -364,20 +324,25 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 5 Maths
     elif year == 5 and subject == "Maths":
-        return (opening_5_maths, attitude_5_maths, number_5_maths, None,
-               target_5_maths, None, closer_5_maths)
+        if variant == 2:
+            return (opening_5_maths_v2, attitude_5_maths_v2, number_5_maths_v2, None,
+                   target_5_maths_v2, None, closer_5_maths_v2)
+        else:
+            return (opening_5_maths, attitude_5_maths, number_5_maths, None,
+                   target_5_maths, None, closer_5_maths)
     
     # Year 5 Science
     elif year == 5 and subject == "Science":
-        return (opening_5_sci, attitude_5_sci, science_5_sci, None,
-               target_5_sci, None, closer_5_sci)
+        if variant == 2:
+            return (opening_5_sci_v2, attitude_5_sci_v2, science_5_sci_v2, None,
+                   target_5_sci_v2, None, closer_5_sci_v2)
+        else:
+            return (opening_5_sci, attitude_5_sci, science_5_sci, None,
+                   target_5_sci, None, closer_5_sci)
     
     # Year 7 English
     elif year == 7 and subject == "English":
-        if variant == 1 and opening_7_eng_v1:
-            return (opening_7_eng_v1, attitude_7_eng_v1, reading_7_eng_v1, writing_7_eng_v1,
-                   target_7_eng_v1, target_write_7_eng_v1, closer_7_eng_v1)
-        elif variant == 2 and opening_7_eng_v2:
+        if variant == 2:
             return (opening_7_eng_v2, attitude_7_eng_v2, reading_7_eng_v2, writing_7_eng_v2,
                    target_7_eng_v2, target_write_7_eng_v2, closer_7_eng_v2)
         else:
@@ -386,15 +351,16 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 7 Maths
     elif year == 7 and subject == "Maths":
-        return (opening_7_maths, attitude_7_maths, number_7_maths, None,
-               target_7_maths, None, closer_7_maths)
+        if variant == 2:
+            return (opening_7_maths_v2, attitude_7_maths_v2, number_7_maths_v2, None,
+                   target_7_maths_v2, None, closer_7_maths_v2)
+        else:
+            return (opening_7_maths, attitude_7_maths, number_7_maths, None,
+                   target_7_maths, None, closer_7_maths)
     
     # Year 7 Science
     elif year == 7 and subject == "Science":
-        if variant == 1 and opening_7_sci_v1:
-            return (opening_7_sci_v1, attitude_7_sci_v1, science_7_sci_v1, None,
-                   target_7_sci_v1, None, closer_7_sci_v1)
-        elif variant == 2 and opening_7_sci_v2:
+        if variant == 2:
             return (opening_7_sci_v2, attitude_7_sci_v2, science_7_sci_v2, None,
                    target_7_sci_v2, None, closer_7_sci_v2)
         else:
@@ -403,10 +369,7 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 8 English
     elif year == 8 and subject == "English":
-        if variant == 1 and opening_8_eng_v1:
-            return (opening_8_eng_v1, attitude_8_eng_v1, reading_8_eng_v1, writing_8_eng_v1,
-                   target_8_eng_v1, target_write_8_eng_v1, closer_8_eng_v1)
-        elif variant == 2 and opening_8_eng_v2:
+        if variant == 2:
             return (opening_8_eng_v2, attitude_8_eng_v2, reading_8_eng_v2, writing_8_eng_v2,
                    target_8_eng_v2, target_write_8_eng_v2, closer_8_eng_v2)
         else:
@@ -415,15 +378,16 @@ def get_statement_banks(subject, year, variant=0):
     
     # Year 8 Maths
     elif year == 8 and subject == "Maths":
-        return (opening_8_maths, attitude_8_maths, maths_8_maths, None,
-               target_8_maths, None, closer_8_maths)
+        if variant == 2:
+            return (opening_8_maths_v2, attitude_8_maths_v2, maths_8_maths_v2, None,
+                   target_8_maths_v2, None, closer_8_maths_v2)
+        else:
+            return (opening_8_maths, attitude_8_maths, maths_8_maths, None,
+                   target_8_maths, None, closer_8_maths)
     
     # Year 8 Science
     elif year == 8 and subject == "Science":
-        if variant == 1 and opening_8_sci_v1:
-            return (opening_8_sci_v1, attitude_8_sci_v1, science_8_sci_v1, None,
-                   target_8_sci_v1, None, closer_8_sci_v1)
-        elif variant == 2 and opening_8_sci_v2:
+        if variant == 2:
             return (opening_8_sci_v2, attitude_8_sci_v2, science_8_sci_v2, None,
                    target_8_sci_v2, None, closer_8_sci_v2)
         else:
@@ -437,7 +401,7 @@ def get_statement_banks(subject, year, variant=0):
 def generate_comment(subject, year, name, gender, att, achieve, target, pronouns, attitude_target=None, variant=0):
     """
     Generate report comment with optional variant support.
-    variant: 0 = original, 1 = variant1, 2 = variant2
+    variant: 0 = variant1, 2 = variant2
     """
     p, p_poss = pronouns
     name = sanitize_input(name)
@@ -571,22 +535,25 @@ def generate_comment(subject, year, name, gender, att, achieve, target, pronouns
 
 def get_available_variants(subject, year):
     """Check which variants are available for a given subject/year"""
-    available = [0]  # 0 = original always available
+    available = [0]  # 0 = variant1 always available
     
     if year == 5 and subject == "English":
-        if opening_5_eng_v1: available.append(1)
         if opening_5_eng_v2: available.append(2)
+    elif year == 5 and subject == "Maths":
+        if opening_5_maths_v2: available.append(2)
+    elif year == 5 and subject == "Science":
+        if opening_5_sci_v2: available.append(2)
     elif year == 7 and subject == "English":
-        if opening_7_eng_v1: available.append(1)
         if opening_7_eng_v2: available.append(2)
+    elif year == 7 and subject == "Maths":
+        if opening_7_maths_v2: available.append(2)
     elif year == 7 and subject == "Science":
-        if opening_7_sci_v1: available.append(1)
         if opening_7_sci_v2: available.append(2)
     elif year == 8 and subject == "English":
-        if opening_8_eng_v1: available.append(1)
         if opening_8_eng_v2: available.append(2)
+    elif year == 8 and subject == "Maths":
+        if opening_8_maths_v2: available.append(2)
     elif year == 8 and subject == "Science":
-        if opening_8_sci_v1: available.append(1)
         if opening_8_sci_v2: available.append(2)
     
     return available
@@ -826,7 +793,7 @@ if app_mode == "Single Student":
                                                    variant=variant_num)
                 
                 if len(available_variants) > 1:
-                    variant_label = "Original" if variant_num == 0 else f"Variant {variant_num}"
+                    variant_label = "Variant 1" if variant_num == 0 else "Variant 2"
                     st.success(f"✨ {variant_label} generated!")
                 else:
                     st.info("💡 No variant files found. Add variant statement files to enable different versions.")
