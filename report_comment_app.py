@@ -764,6 +764,3 @@ if app_mode == "Single Student":
 
         col_stats = st.columns(4)
         with col_stats[0]:
-            st.metric("Character Count", f"{char_count}/{TARGET_CHARS}")
-        with col_stats[1]:
-            st.m
